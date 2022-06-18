@@ -3,17 +3,22 @@ import { ref } from 'vue'
 import Square from "./Square.vue";
 import generateFibonacci from "../utils/generateFibonacci";
 
-const gridArray = () => [...Array(50)].map(x => Array(50).fill(0));
+const gridArray = () => [...Array(50)].map(x => [...Array(50)].map(() => { return {number: 0, isFibonacci: false }}))
 const fibonacciSeries = generateFibonacci(50)
 const grid = ref(gridArray())
 
 const findFibonacci = () => {
   const arr = Array.from(grid.value[0])
   for (const index of arr.keys()) {
-    const toCheck = arr.slice(index, index + 5)
+    const toCheckArr = arr.slice(index, index + 5)
+    const toCheck = arr.slice(index, index + 5).map(x => x.number)
     for (const index2 of fibonacciSeries.keys()) {
       const toCheck2 = fibonacciSeries.slice(index2, index2 + 5)
       if (toCheck2.toString() === toCheck.toString()) {
+        console.log(toCheckArr)
+        toCheckArr.forEach(x => {
+          x.isFibonacci = true
+        })
         return true
       }
     }
@@ -22,12 +27,12 @@ const findFibonacci = () => {
 }
 
 const updateRowNumber = (columnNumber: number, columnPosition: number) => {
-  grid.value.forEach((row, i) => {
+  Array.from(grid.value).forEach((row, i) => {
     row.forEach((value, j) => {
       if (i === columnNumber) {
-        grid.value[i][j] += 1;
+        grid.value[i][j].number = grid.value[i][j].number + 1;
         if (j === columnNumber) return
-        grid.value[j][columnPosition] += 1;
+        grid.value[j][columnPosition].number += 1;
       }
     });
   });
@@ -46,8 +51,8 @@ const updateRowNumber = (columnNumber: number, columnPosition: number) => {
         :updateRowNumber="updateRowNumber"
         :squareValue="squareNumber"
       >
-        <span v-show="squareNumber > 0">
-          {{ squareNumber }}
+        <span v-show="squareNumber.number > 0">
+          {{ squareNumber.number }}
         </span>
       </Square>
     </div>

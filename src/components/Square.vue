@@ -8,17 +8,28 @@ export default defineComponent({
     rowNumber: Number,
     rowIndex: Number,
     updateRowNumber: Function,
-    squareValue: Number
+    squareValue: Object
   },
   setup(props) {
     const backgroundColor = ref('#c4c4c4')
-
     watch(
-        () => props.squareValue,
-        async (memes) => {
+        () => props.squareValue?.number,
+        async () => {
+          if (props.squareValue?.isFibonacci) return
           backgroundColor.value = '#E8BF1FFF'
           await delay(500)
           backgroundColor.value = '#c4c4c4'
+        }
+    )
+
+    watch(
+        () => props.squareValue?.isFibonacci,
+        async () => {
+          backgroundColor.value = 'green'
+          await delay(800)
+          backgroundColor.value = '#c4c4c4'
+          if (!props.squareValue?.number) return
+          props.squareValue.number = 0
         }
     )
 
@@ -33,7 +44,7 @@ export default defineComponent({
 
 <template>
   <div class="square" @click="updateRowNumber(rowNumber, rowIndex)">
-    <span class="square__index">{{rowNumber}}</span>
+<!--    <span class="square__index">{{rowNumber}} {{rowIndex}}</span>-->
     <slot></slot>
   </div>
 </template>
