@@ -13,23 +13,23 @@ export default defineComponent({
   setup(props) {
     const backgroundColor = ref('#c4c4c4')
     watch(
+        () => props.squareValue?.isFibonacci,
+        async () => {
+          backgroundColor.value = 'green'
+          await delay(800)
+          backgroundColor.value = '#c4c4c4'
+          // if (!props.squareValue?.number) return
+          // props.squareValue.number = 0
+        }
+    )
+
+    watch(
         () => props.squareValue?.number,
         async () => {
           if (props.squareValue?.isFibonacci) return
           backgroundColor.value = '#E8BF1FFF'
           await delay(500)
           backgroundColor.value = '#c4c4c4'
-        }
-    )
-
-    watch(
-        () => props.squareValue?.isFibonacci,
-        async () => {
-          backgroundColor.value = 'green'
-          await delay(800)
-          backgroundColor.value = '#c4c4c4'
-          if (!props.squareValue?.number) return
-          props.squareValue.number = 0
         }
     )
 

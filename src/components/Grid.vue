@@ -1,29 +1,47 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import {Ref, ref} from 'vue'
 import Square from "./Square.vue";
 import generateFibonacci from "../utils/generateFibonacci";
 
-const gridArray = () => [...Array(50)].map(x => [...Array(50)].map(() => { return {number: 0, isFibonacci: false }}))
+interface GridColumn {
+  number: number
+  isFibonacci: boolean
+}
+
+const gridArray = () => [...Array(50)].map(() => [...Array(50)].map(() => {
+  return {
+    number: 0,
+    isFibonacci: false
+  }
+}))
 const fibonacciSeries = generateFibonacci(50)
-const grid = ref(gridArray())
+const grid: Ref<GridColumn[][]> = ref(gridArray())
+
+const formArrays = () => {
+  const reversedColumns = grid.value.slice().map((row) => row.reverse())
+  const rows = grid.value.slice().map((column) => column.map((row, rowIndex) => column[rowIndex]))
+  const reversedRows = rows.slice().map((row) => row.reverse())
+  return [...grid.value, ...reversedColumns, ...rows, ...reversedRows]
+}
 
 const findFibonacci = () => {
-  const arr = Array.from(grid.value[0])
-  for (const index of arr.keys()) {
-    const toCheckArr = arr.slice(index, index + 5)
-    const toCheck = arr.slice(index, index + 5).map(x => x.number)
-    for (const index2 of fibonacciSeries.keys()) {
-      const toCheck2 = fibonacciSeries.slice(index2, index2 + 5)
-      if (toCheck2.toString() === toCheck.toString()) {
-        console.log(toCheckArr)
-        toCheckArr.forEach(x => {
-          x.isFibonacci = true
-        })
-        return true
-      }
-    }
-  }
-  return false
+  const arr = Array.from(grid.value)
+  arr.forEach((lateral) => {
+    lateral.forEach((row, rowIndex) => {
+      const toCheckArr = lateral.slice(rowIndex, rowIndex + 5)
+      const toCheck = lateral.slice(rowIndex, rowIndex + 5).map(x => x.number)
+      fibonacciSeries.forEach((fibonacci, fibonacciIndex) => {
+        const toCheck2 = fibonacciSeries.slice(fibonacciIndex, fibonacciIndex + 5)
+        if (toCheck.length < 5) return
+        if (toCheck2.toString() === toCheck.toString()) {
+          toCheckArr.forEach(x => {
+            x.isFibonacci = true
+            x.number = 0
+          })
+        }
+      })
+    })
+  })
 }
 
 const updateRowNumber = (columnNumber: number, columnPosition: number) => {
@@ -36,7 +54,7 @@ const updateRowNumber = (columnNumber: number, columnPosition: number) => {
       }
     });
   });
-  console.log(findFibonacci());
+  findFibonacci()
 }
 
 </script>
@@ -63,5 +81,6 @@ const updateRowNumber = (columnNumber: number, columnPosition: number) => {
 .grid {
   display: flex;
   gap: 3px;
+  margin-left: 3px;
 }
 </style>
