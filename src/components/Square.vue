@@ -12,25 +12,30 @@ export default defineComponent({
   },
   setup(props) {
     const backgroundColor = ref('#c4c4c4')
+    // Watches for isFibonacci to be true then flashes background color to green
     watch(
-        () => props.squareValue?.isFibonacci,
-        async () => {
-          backgroundColor.value = 'green'
+      () => props.squareValue?.isFibonacci,
+      async () => {
+        if (props.squareValue?.isFibonacci) {
+          await delay(100)
+          backgroundColor.value = '#49A23EFF'
           await delay(800)
           backgroundColor.value = '#c4c4c4'
-          // if (!props.squareValue?.number) return
-          // props.squareValue.number = 0
+          props.squareValue.isFibonacci = false
         }
+      }, { immediate: true }
     )
 
+    // Watches for value prop to update, so we can paint it yellow
     watch(
-        () => props.squareValue?.number,
-        async () => {
-          if (props.squareValue?.isFibonacci) return
-          backgroundColor.value = '#E8BF1FFF'
-          await delay(500)
-          backgroundColor.value = '#c4c4c4'
-        }
+      () => props.squareValue?.number, async (first, second) => {
+        if (first?.isFibonacci !== second?.isFibonacci) return
+        if (props.squareValue?.isFibonacci) return
+        backgroundColor.value = '#E8BF1FFF'
+        await delay(500)
+        backgroundColor.value = '#c4c4c4'
+      }, { immediate: true }
+
     )
 
     return {
@@ -44,7 +49,6 @@ export default defineComponent({
 
 <template>
   <div class="square" @click="updateRowNumber(rowNumber, rowIndex)">
-<!--    <span class="square__index">{{rowNumber}} {{rowIndex}}</span>-->
     <slot></slot>
   </div>
 </template>
