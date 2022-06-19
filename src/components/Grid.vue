@@ -42,23 +42,36 @@ const findFibonacci = async () => {
   // ...0, 4, 0, [2, 3, 5, 8, 13], 3, 14, 2, 0, 7, 3... <- grid slice
   // ...1, 1, 0, [2, 3, 5, 8, 13], 21, 34, 55, 19, 2... <- Fibonacci series
   // Ex: For every grid slice sample apply the same 5 number sampling technique
-  // as above and compare, marking the matching number's squares as Fibonacci
+  // as above and compare, push each found match into an array and mark isFibonacci true.
+
+  const validFibonacciSeries: GridColumn[][] = [];
 
   verticalAndHorizontalSlices.forEach((slice) => {
     slice.forEach((row, rowIndex) => {
+      let fibonacciChunk
       const sourceChunk = slice.slice(rowIndex, rowIndex + 5)
       const chunkToCheck = slice.slice(rowIndex, rowIndex + 5).map(x => x.number)
       fibonacciSeries.forEach((fibonacci, fibonacciIndex) => {
-        const fibonacciChunk = fibonacciSeries.slice(fibonacciIndex, fibonacciIndex + 5)
+        fibonacciChunk = fibonacciSeries.slice(fibonacciIndex, fibonacciIndex + 5)
         if (chunkToCheck.length < 5) return
         if (fibonacciChunk.toString() === chunkToCheck.toString()) {
-          sourceChunk.forEach(square => {
-            square.isFibonacci = true
-            square.number = 0
-          })
+          validFibonacciSeries.push(sourceChunk)
+        }
+      })
+      // Match the sequence backwards, so we can find matches that are in reverse.
+      fibonacciSeries.reverse().forEach((fibonacci, fibonacciIndex) => {
+        fibonacciChunk = fibonacciSeries.slice(fibonacciIndex, fibonacciIndex + 5)
+        if (chunkToCheck.length < 5) return
+        if (fibonacciChunk.toString() === chunkToCheck.toString()) {
+          validFibonacciSeries.push(sourceChunk)
         }
       })
     })
+  })
+
+  validFibonacciSeries.flat().forEach(square => {
+    square.isFibonacci = true
+    square.number = 0
   })
 }
 
